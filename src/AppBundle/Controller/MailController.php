@@ -19,7 +19,6 @@ class MailController extends Controller
 
     public function sendAction()
     {
-
         // Create the Transport
         $transport = (new Swift_SmtpTransport('email-smtp.eu-west-1.amazonaws.com', 587, 'tls'))
             ->setUsername('AKIAIAFOOIBNVM42XSOA')
@@ -27,12 +26,6 @@ class MailController extends Controller
             ->setStreamOptions([
                 'ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]]);
 
-        /*
-        You could alternatively use a different transport such as Sendmail:
-
-        // Sendmail
-        $transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
-        */
 
 // Create the Mailer using your created Transport
         $mailer = new Swift_Mailer($transport);
@@ -40,23 +33,13 @@ class MailController extends Controller
 // Create a message
         $message = (new Swift_Message('Testing SES'))
             ->setFrom(['troyan123@engineer.com'])
-            ->setTo(['mateusztrojanowski37@gmail.com'])//tutaj mozna wpisac wiele?
+            ->setTo(['mateusztrojanowski37@gmail.com'])
             ->setBody('Test AWS');
 
-// Send the message - disable for testing
-        //$result = $mailer->send($message);
+// Send the message
         $mailer->send($message);
 
 
-        //printf("Sent %d messages\n", $result);
-
-/*
-        if ($mailer->send($message)) {
-            echo "Sent\n";
-        } else {
-            echo "Failed\n";
-        }
-*/
         return $this->render('main.html.twig');
     }
 

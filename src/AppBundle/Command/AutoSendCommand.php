@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace AppBundle\Command;
 
 use AppBundle\Entity\Entity\Email;
 use AppBundle\Entity\Entity\Email_has_tag;
@@ -8,39 +8,32 @@ use AppBundle\Entity\Entity\Mailing;
 use AppBundle\Entity\Entity\Mailing_has_tag;
 use AppBundle\Entity\Entity\MasterIndex;
 use AppBundle\Entity\Entity\Tag;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use SplFixedArray;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\DeprecatedClass;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 
-class AutoSendController extends Controller
+class AutoSendCommand extends ContainerAwareCommand
 {
-    /**
-     *
-     * @return Response
-     */
 
-    public function sendAction()
+    protected static $defaultName = 'app:auto-send';
+    
+    public function execute(InputInterface $input, OutputInterface $output)
     {
 
-
         //pobierz z bazy i wyslij jedna wiadomosc - uruchom co 1 minute
-
         $shouldSend = true;
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->getContainer()->get('doctrine')->getManager();
 
-        $tagMailingRepository = $this->getDoctrine()->getRepository(Mailing_has_tag::class);
-        $mailingRepository = $this->getDoctrine()->getRepository(Mailing::class);
-        $tagRepository = $this->getDoctrine()->getRepository(Tag::class);
-        $emailTagRepository = $this->getDoctrine()->getRepository(Email_has_tag::class);
-        $emailRepository = $this->getDoctrine()->getRepository(Email::class);
-        $masterIndexRepository = $this->getDoctrine()->getRepository(MasterIndex::class);
+        $tagMailingRepository = $this->getContainer()->get('doctrine')->getRepository(Mailing_has_tag::class);
+        $mailingRepository = $this->getContainer()->get('doctrine')->getRepository(Mailing::class);
+        $tagRepository = $this->getContainer()->get('doctrine')->getRepository(Tag::class);
+        $emailTagRepository = $this->getContainer()->get('doctrine')->getRepository(Email_has_tag::class);
+        $emailRepository = $this->getContainer()->get('doctrine')->getRepository(Email::class);
+        $masterIndexRepository = $this->getContainer()->get('doctrine')->getRepository(MasterIndex::class);
 
 
         $mailing = $mailingRepository->findOneBy(array('status' => 'S'));
@@ -89,13 +82,9 @@ class AutoSendController extends Controller
                     $masterIndexRepository->find(0)->setMaster(0);
                 }
 
-                //array_push($emailList,$singleEmailAddress);
 
             } else {
-
-                throw $this->createNotFoundException(
-                    'No tag found'
-                );
+                   // 'No tag found'
             }
 
 
@@ -117,7 +106,6 @@ class AutoSendController extends Controller
             }
 
             $entityManager->flush();
-            return new Response('success');
         }
     }
 
