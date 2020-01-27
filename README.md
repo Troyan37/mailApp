@@ -1,4 +1,1 @@
-.checkout
-=========
-
-A Symfony project created on May 14, 2018, 1:16 pm.
+Automatic mailer PHP Application with MySql and AWS config
